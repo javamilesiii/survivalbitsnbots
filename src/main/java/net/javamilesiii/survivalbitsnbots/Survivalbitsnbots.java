@@ -6,8 +6,7 @@ import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
 import net.createmod.catnip.lang.FontHelper;
-import net.javamilesiii.survivalbitsnbots.commands.TPA;
-import net.javamilesiii.survivalbitsnbots.commands.TPHERE;
+import net.javamilesiii.survivalbitsnbots.commands.*;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -58,5 +57,9 @@ public class Survivalbitsnbots {
         CommandDispatcher<CommandSourceStack> dispather = event.getDispatcher();
         TPA.register(dispather);
         TPHERE.register(dispather);
+        CoordsGetter.register(dispather);
+        PrefixCommand.register(dispather);
+        SetTeamColor.register(dispather);
+        //SetPermission.register(dispather);
     }
 }

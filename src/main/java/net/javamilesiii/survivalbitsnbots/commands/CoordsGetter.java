@@ -8,24 +8,25 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
-public class TPHERE {
+import java.util.function.Supplier;
+
+public class CoordsGetter {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("tphere")
-                .requires(source -> source.hasPermission(2))
+        dispatcher.register(Commands.literal("coords")
                 .then(Commands.argument("target", EntityArgument.player())
                         .requires(src -> src.hasPermission(2))
                         .executes(ctx -> {
                             ServerPlayer executor = ctx.getSource().getPlayerOrException();
                             ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
 
-                            if (executor.getUUID().equals(target.getUUID())) {
-                                executor.sendSystemMessage(Component.literal("You cannot teleport yourself.").withStyle(ChatFormatting.RED));
-                                return 0;
-                            }
+                            double x = target.getX();
+                            double y = target.getY();
+                            double z = target.getZ();
+                            String dims = target.level().dimension().location().toString();
+                            String coordsMessage = String.format("Player %s is at: X=%.1f Y=%.1f Z=%.1f in dimension %s",
+                                    target.getName().getString(), x, y, z, dims);
+                            executor.sendSystemMessage(Component.literal(coordsMessage).withStyle(ChatFormatting.GREEN));
 
-                            target.teleportTo(executor.getX(), executor.getY(), executor.getZ());
-                            executor.sendSystemMessage(Component.literal("Teleported " + target.getName().getString() + " to you.").withStyle(ChatFormatting.GREEN));
-                            target.sendSystemMessage(Component.literal("You have been teleported to " + executor.getName().getString() + ".").withStyle(ChatFormatting.YELLOW));
                             return 1;
                         })
                 )

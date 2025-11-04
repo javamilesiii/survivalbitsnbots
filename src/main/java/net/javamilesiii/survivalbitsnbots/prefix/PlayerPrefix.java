@@ -14,22 +14,27 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import java.util.Objects;
 
-/**
- * Server-seitige Team/Prefix-Verwaltung.
- * - erstellt/aktualisiert Teams auf dem Server-Scoreboard
- * - weist Spieler beim Login dem richtigen Team zu (sichtbar in Tab & Nametag)
- * - formatiert Chat (Event abfangen und eigene Broadcast)
- */
 @EventBusSubscriber(modid = Survivalbitsnbots.MODID, value = Dist.DEDICATED_SERVER)
 public class PlayerPrefix {
     private static final String MOD_PREFIX = "survivalbitsnbots_";
     private static final String ADMIN_TEAM = MOD_PREFIX + "Admin";
     private static final String CREATOR_TEAM = MOD_PREFIX + "Creator";
     private static final String MEMBER_TEAM = MOD_PREFIX + "Member";
+    private static final String SERVER_TEAM = MOD_PREFIX + "Server";
 
-    private static final Component ADMIN_PREFIX = Component.literal("[Admin] ").withStyle(ChatFormatting.DARK_RED);
-    private static final Component CREATOR_PREFIX = Component.literal("[Creator] ").withStyle(ChatFormatting.GOLD);
-    private static final Component MEMBER_PREFIX = Component.literal("[Member] ").withStyle(ChatFormatting.DARK_AQUA);
+    private static int adminPermissionLevel = 4;
+    private static int creatorPermissionLevel = 1;
+    private static int memberPermissionLevel = 0;
+
+    private static ChatFormatting adminColor = ChatFormatting.DARK_RED;
+    private static ChatFormatting creatorColor = ChatFormatting.GOLD;
+    private static ChatFormatting memberColor = ChatFormatting.DARK_AQUA;
+    private static ChatFormatting serverColor = ChatFormatting.DARK_GRAY;
+
+    private static final Component ADMIN_PREFIX = Component.literal("[Admin] ").withStyle(adminColor);
+    private static final Component CREATOR_PREFIX = Component.literal("[Creator] ").withStyle(creatorColor);
+    private static final Component MEMBER_PREFIX = Component.literal("[Member] ").withStyle(memberColor);
+    private static final Component SERVER_PREFIX = Component.literal("[Server] ").withStyle(serverColor);
 
     private static void ensureTeam(Scoreboard scoreboard, String name, Component prefix) {
         if (scoreboard == null || name == null) return;
@@ -55,17 +60,19 @@ public class PlayerPrefix {
     }
 
     private static String getPlayerTeamName(ServerPlayer player) {
-        // Achtung: hasPermissions(int) prüft OP-Level, nicht Permission-Plugins.
-        if (player.hasPermissions(4)) return ADMIN_TEAM;
-        if (player.hasPermissions(2)) return CREATOR_TEAM;
-        return MEMBER_TEAM;
+        if (player.hasPermissions(adminPermissionLevel)) return ADMIN_TEAM;
+        if (player.hasPermissions(creatorPermissionLevel)) return CREATOR_TEAM;
+        if (player.hasPermissions(memberPermissionLevel)) return MEMBER_TEAM;
+
+        return SERVER_TEAM;
     }
 
     private static Component getTeamPrefixComponent(String team) {
         return switch (team) {
             case ADMIN_TEAM -> ADMIN_PREFIX;
             case CREATOR_TEAM -> CREATOR_PREFIX;
-            default -> MEMBER_PREFIX;
+            case MEMBER_TEAM -> MEMBER_PREFIX;
+            default -> SERVER_PREFIX;
         };
     }
 
@@ -106,8 +113,45 @@ public class PlayerPrefix {
         // Cancel default behavior and broadcast a component-based message
         event.setCanceled(true);
 
-        Component message = Component.empty().append(prefix).append(Component.literal(player.getName().getString()).withStyle(ChatFormatting.WHITE)).append(Component.literal(": ")).append(Component.literal(event.getMessage().getString()).withStyle(ChatFormatting.GRAY));
+        Component message = Component.empty().append(prefix).append(Component.literal(player.getName().getString()).withStyle(ChatFormatting.WHITE)).append(Component.literal(": ")).append(Component.literal(event.getMessage().getString()));
 
         player.server.getPlayerList().broadcastSystemMessage(message, false);
+    }
+
+    public static void reassignAllPlayers(net.minecraft.server.MinecraftServer server) {
+        if (server == null) return;
+        server.getPlayerList().getPlayers().forEach(player -> {
+            if (player instanceof ServerPlayer sp) {
+                assignTeam(sp);
+            }
+        });
+    }
+
+    public static void setAdminPermissionLevel(int level) {
+        adminPermissionLevel = level;
+    }
+
+    public static void setCreatorPermissionLevel(int level) {
+        creatorPermissionLevel = level;
+    }
+
+    public static void setMemberPermissionLevel(int level) {
+        memberPermissionLevel = level;
+    }
+
+    public static void setAdminColor(ChatFormatting color) {
+        adminColor = color;
+    }
+
+    public static void setCreatorColor(ChatFormatting color) {
+        creatorColor = color;
+    }
+
+    public static void setMemberColor(ChatFormatting color) {
+        memberColor = color;
+    }
+
+    public static void setServerColor(ChatFormatting color) {
+        serverColor = color;
     }
 }

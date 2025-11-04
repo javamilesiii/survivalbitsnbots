@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class TPA {
     private static final Map<UUID, UUID> requests = new HashMap<>();
@@ -24,8 +23,9 @@ public class TPA {
         dispatcher.register(Commands.literal("tpa")
                 // help argument
                 .then(Commands.literal("help").executes(ctx -> {
-                    ctx.getSource().sendSuccess((Supplier<Component>) Component.literal("Usage: /tpa <player> | /tpa accept | /tpa deny | /tpa cancel").withStyle(ChatFormatting.AQUA), false);
-                    ctx.getSource().sendSuccess((Supplier<Component>) Component.literal("Description: Send a teleport request to a player or manage incoming requests.").withStyle(ChatFormatting.YELLOW), false);
+                    ServerPlayer target = ctx.getSource().getPlayerOrException();
+                    target.sendSystemMessage(Component.literal("Usage: /tpa <player> | /tpa accept | /tpa deny | /tpa cancel").withStyle(ChatFormatting.AQUA), false);
+                    target.sendSystemMessage(Component.literal("Description: Send a teleport request to a player or manage incoming requests.").withStyle(ChatFormatting.YELLOW), false);
                     return 1;
                 }))
 
