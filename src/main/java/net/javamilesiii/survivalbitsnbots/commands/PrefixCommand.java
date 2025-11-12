@@ -8,7 +8,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 
 public class PrefixCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -17,7 +16,7 @@ public class PrefixCommand {
                 .then(Commands.argument("type", StringArgumentType.word())
                         .then(Commands.argument("level", IntegerArgumentType.integer(0, 4))
                                 .executes(ctx -> {
-                                    ServerPlayer executor = ctx.getSource().getPlayerOrException();
+                                    CommandSourceStack executor = ctx.getSource();
                                     String type = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "type");
                                     int level = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "level");
                                     switch (type) {

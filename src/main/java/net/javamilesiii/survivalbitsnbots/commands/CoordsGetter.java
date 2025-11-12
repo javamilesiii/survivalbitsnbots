@@ -16,7 +16,7 @@ public class CoordsGetter {
                 .then(Commands.argument("target", EntityArgument.player())
                         .requires(src -> src.hasPermission(2))
                         .executes(ctx -> {
-                            ServerPlayer executor = ctx.getSource().getPlayerOrException();
+                            CommandSourceStack executor = ctx.getSource();
                             ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
 
                             double x = target.getX();

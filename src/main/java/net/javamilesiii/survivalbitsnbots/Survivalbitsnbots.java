@@ -60,6 +60,7 @@ public class Survivalbitsnbots {
         CoordsGetter.register(dispather);
         PrefixCommand.register(dispather);
         SetTeamColor.register(dispather);
+        InvSee.register(dispather);
         //SetPermission.register(dispather);
     }
 }

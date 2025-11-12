@@ -6,11 +6,8 @@ import net.javamilesiii.survivalbitsnbots.prefix.PlayerPrefix;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class SetTeamColor {
@@ -27,7 +24,7 @@ public class SetTeamColor {
                 .then(Commands.argument("team", StringArgumentType.word())
                         .then(Commands.argument("color", StringArgumentType.word())
                                 .executes(ctx -> {
-                                    ServerPlayer executor = ctx.getSource().getPlayerOrException();
+                                    CommandSourceStack executor = ctx.getSource();
                                     String team = StringArgumentType.getString(ctx, "team").toLowerCase();
                                     String colorName = StringArgumentType.getString(ctx, "color").toUpperCase();
                                     ChatFormatting color;
@@ -37,7 +34,7 @@ public class SetTeamColor {
                                         executor.sendSystemMessage(Component.literal("Invalid color.").withStyle(ChatFormatting.RED));
                                         return 0;
                                     }
-                                    switch (team){
+                                    switch (team) {
                                         case "admin":
                                             PlayerPrefix.setAdminColor(color);
                                             executor.sendSystemMessage(Component.literal("Set admin team color to " + colorName).withStyle(ChatFormatting.GREEN));
